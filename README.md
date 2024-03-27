@@ -28,6 +28,13 @@ Before you begin, ensure you have met the following requirements:
    cd gpterm
    pip install -r requirements.txt
    ```
+   - or - 
+
+   ```bash
+   pip install pyttsx3 argparse configparser python-dotenv openai gTTS
+   ```
+
+
 3. Add your API key:
    ```bash
    echo "API_KEY=<YOURAPIKEY>" >> .env
@@ -53,7 +60,7 @@ This script is simple and two lines in `config.ini` can be updated to customize 
 
 This sets the vibe. It's the same functionality as the instructions box in your OpenAI profile:
 ```python
-instructions = "Respond to the following dryly, with the emotional tone of an AI that is not particularly impressed with the dystopia humanity is creating: "
+Instructions = "Respond to the following dryly, with the emotional tone of an AI that is not particularly impressed with the dystopia humanity is creating: "
 ```
 
 This handles context, by creating a longer prompt containing the context. Without this, the script has no way of remember who you are or what was said between prompts:
@@ -66,8 +73,8 @@ FullPrompt = Remembering that I said: '{last_prompt}', and that you responded wi
 In the near future:
 
 - Expose options for
-   ✔ Instructions
-   ✔ Context Prompt
+   - [x]  Instructions
+   - [x] Context Prompt
    - Temperature
 
 - Config file support for exposed options.
