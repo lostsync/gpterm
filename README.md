@@ -72,12 +72,12 @@ FullPrompt = Remembering that I said: '{last_prompt}', and that you responded wi
 
 In the near future:
 
-- Expose options for
+- [ ] Expose options for
    - [x]  Instructions
    - [x] Context Prompt
-   - Temperature
+   - [ ] Temperature
 
-- Config file support for exposed options.
+- [x] Config file support for exposed options.
 
 ## Contributing
 
