@@ -15,17 +15,22 @@ Before you begin, ensure you have met the following requirements:
 - Python 3.6+
 - OpenAI API key
 - Additional Python libraries: `dotenv`, `openai`, `gtts`, `pyttsx3`
+- OS Packages: `mpg123` for `gTTS` support
 
 ## Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/gpterm.git
+   git clone https://github.com/lostsync/gpterm.git
    ```
 2. Navigate to the project directory and install the dependencies:
    ```bash
    cd gpterm
    pip install -r requirements.txt
+   ```
+3. Add your API key:
+   ```bash
+   echo "API_KEY=<YOURAPIKEY>" >> .env
    ```
 
 ## Usage
@@ -39,6 +44,34 @@ python gpterm.py --tts [off|gtts|espeak]
 - `--tts off`: Disables TTS (default).
 - `--tts gtts`: Uses Google's Text-to-Speech engine.
 - `--tts espeak`: Uses the eSpeak TTS engine.
+
+Type `quit` or `exit` to quit or exit. You can use `quit` to exit or `exit` to quit. You have options.
+
+## Customization
+
+This script is simple and two lines can be updated to fully customize the behavior of the script. 
+
+This sets the vibe. It's the same functionality as the instructions box in your OpenAI profile:
+```python
+instructions = "Respond to the following dryly, with the emotional tone of an AI that is not particularly impressed with the dystopia humanity is creating: "
+```
+
+This handles context, by creating a longer prompt containing the context. Without this, the script has no way of remember who you are or what was said between prompts:
+```python
+    if last_prompt and last_response:
+        full_prompt = f"Remembering that I said: '{last_prompt}', and that you responded with this: '{last_response}', and being mindful of the potential to change topics, please respond to what I have said next, which is this: {prompt}"
+```
+
+## Roadmap
+
+In the near future:
+
+- Expose options for
+   - Instructions
+   - Context Prompt
+   - Temperature
+
+- Config file support for exposed options.
 
 ## Contributing
 
