@@ -45,6 +45,23 @@ python gpterm.py --tts [off|gtts|espeak]
 - `--tts gtts`: Uses Google's Text-to-Speech engine.
 - `--tts espeak`: Uses the eSpeak TTS engine.
 
+Type `quit` or `exit` to quit or exit. You can use `quit` to exit or `exit` to quit. You have options.
+
+## Customization
+
+This script is simple and two lines can be updated to fully customize the behavior of the script. 
+
+This sets the vibe. It's the same functionality as the instructions box in your OpenAI profile:
+```python
+instructions = "Respond to the following dryly, with the emotional tone of an AI that is not particularly impressed with the dystopia humanity is creating: "
+```
+
+This handles context, by creating a longer prompt containing the context. Without this, the script has no way of remember who you are or what was said between prompts:
+```python
+    if last_prompt and last_response:
+        full_prompt = f"Remembering that I said: '{last_prompt}', and that you responded with this: '{last_response}', and being mindful of the potential to change topics, please respond to what I have said next, which is this: {prompt}"
+```
+
 ## Contributing
 
 Contributions are welcome! For major changes, please open an issue first to discuss what you would like to change.
