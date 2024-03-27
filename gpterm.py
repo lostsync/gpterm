@@ -1,86 +1,82 @@
-import os, time, random, tempfile, threading, subprocess, argparse
+import os
+import time
+import random
+import pyttsx3
+import tempfile
+import argparse
+import threading
+import subprocess
+import configparser
 
 from dotenv import load_dotenv
 from openai import OpenAI
-
 from gtts import gTTS
-import pyttsx3
 
-parser = argparse.ArgumentParser(description="A script to interact with OpenAI's API with optional TTS.")
-parser.add_argument('--tts', '-t', choices=['off', 'gtts', 'espeak'], default='off',
-                    help='Select the text-to-speech system to use: off (default), gtts, or espeak.')
+class OpenAIChat:
+    def __init__(self):
+        self.parser = argparse.ArgumentParser(description="A script to interact with OpenAI's API with optional TTS.")
+        self.parser.add_argument('--tts', '-t', choices=['off', 'gtts', 'espeak'], default='off',
+                            help='Select the text-to-speech system to use: off (default), gtts, or espeak.')
+        self.args = self.parser.parse_args()
+        load_dotenv()
+        API_KEY = os.getenv("API_KEY")
+        if API_KEY is None:
+            raise ValueError("API_KEY not found in environment variables")
+        self.client = OpenAI(api_key=API_KEY)
+        self.last_prompt = None
+        self.last_response = None
+        self.instructions = "Respond to the following dryly, with the emotional tone of an AI that is not particularly impressed with the dystopia humanity is creating: "
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+        self.instructions = config.get('DEFAULT', 'Instructions')
+        self.full_prompt_template = config.get('DEFAULT', 'FullPrompt')
 
-args = parser.parse_args()
 
-load_dotenv()
-API_KEY = os.getenv("API_KEY")
-client = OpenAI(api_key=API_KEY)
-
-
-last_prompt = None
-last_response = None
-
-def speak_response(text, lang='en', tts_option=args.tts):
-    if tts_option == 'gtts':
-        # gTTS functionality here
-        tts = gTTS(text=text, lang='en')
-        tts.save("response.mp3")
-        os.popen("mpg321 response.mp3 > /dev/null 2>&1")
-        pass  # Placeholder for gTTS code
-    elif tts_option == 'espeak':
-        engine = pyttsx3.init()
-        engine.say(text)
-        engine.runAndWait()
-        def _speak(rate_increase=20):
+    def speak_response(self, text, lang='en'):
+        if self.args.tts == 'gtts':
+            tts = gTTS(text=text, lang='en')
+            tts.save("response.mp3")
+            os.popen("mpg321 response.mp3 > /dev/null 2>&1")
+        elif self.args.tts == 'espeak':
             engine = pyttsx3.init()
             rate = engine.getProperty('rate')
-            engine.setProperty('rate', rate + rate_increase)  # Adjust speech rate
+            engine.setProperty('rate', rate + 20)  # Adjust speech rate
             engine.setProperty('voice', 16) 
             engine.say(text)
             engine.runAndWait()
+
+    def type_to_screen(self, input_text):
+        for char in input_text:
+            print(char, end='', flush=True)  # Print character without adding a newline
+            if char == ' ':
+                time.sleep(random.uniform(0.1, 0.25))  # Longer pause for space between words
+            else:
+                time.sleep(random.uniform(0.01, 0.05))  # Shorter random pause between letters
+
+    def generate_response(self, prompt):
+        full_prompt = prompt    
         
-        thread = threading.Thread(target=_speak)
-        thread.start()
+        if self.last_prompt and self.last_response:
+            full_prompt = self.full_prompt_template.format(last_prompt=self.last_prompt, last_response=self.last_response, prompt=prompt)
+        response = self.client.chat.completions.create(model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": self.instructions + full_prompt}])
+        return response.choices[0].message.content.strip()
 
-def type_to_screen(input_text):
-    for char in input_text:
-        print(char, end='', flush=True)  # Print character without adding a newline
-        if char == ' ':
-            time.sleep(random.uniform(0.1, 0.25))  # Longer pause for space between words
-        else:
-            time.sleep(random.uniform(0.01, 0.05))  # Shorter random pause between letters
+    def main(self):
+        while True:
+            user_input = input("> ")
+            if user_input.lower() in ["quit", "exit"]:
+                break
 
-# def speak_response(response):
-#    subprocess.Popen(['espeak-ng', response])
+            self.last_response = self.generate_response(user_input)
+            self.last_prompt = user_input
+            self.speak_response(self.last_response)
 
-instructions = "Respond to the following dryly, with the emotional tone of an AI that is not particularly impressed with the dystopia humanity is creating: "
-
-def generate_response(prompt):
-    global last_prompt, last_response
-    full_prompt = prompt    
-    # print("last_prompt: " + last_prompt)
-    if last_prompt and last_response:
-        full_prompt = f"Remembering that I said: '{last_prompt}', and that you responded with this: '{last_response}', and being mindful of the potential to change topics, please respond to what I have said next, which is this: {prompt}"
-        # print("prompt modified " + full_prompt)
-    response = client.chat.completions.create(model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": instructions + full_prompt}])
-    return response.choices[0].message.content.strip()
-
-def main():
-    global last_prompt, last_response
-    while True:
-        user_input = input("> ")
-        if user_input.lower() in ["quit", "exit"]:
-            break
-
-        last_response = generate_response(user_input)
-        last_prompt = user_input
-        speak_response(last_response)
-
-        print('» ', end='')
-
-        type_to_screen(last_response)
-        print('\n')
+            print('» ', end='')
+            self.type_to_screen(self.last_response)
+            print('\n')
 
 if __name__ == "__main__":
-    main()
+    chat = OpenAIChat()
+    chat.main()
+
