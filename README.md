@@ -28,8 +28,10 @@ Before you begin, ensure you have met the following requirements:
    cd gpterm
    pip install -r requirements.txt
    ```
-3. Set up the environment:
-   `echo "API_KEY=<YOURAPIKEY>" >> .env`
+3. Add your API key:
+   ```bash
+   echo "API_KEY=<YOURAPIKEY>" >> .env
+   ```
 
 ## Usage
 
