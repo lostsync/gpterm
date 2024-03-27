@@ -15,6 +15,7 @@ Before you begin, ensure you have met the following requirements:
 - Python 3.6+
 - OpenAI API key
 - Additional Python libraries: `dotenv`, `openai`, `gtts`, `pyttsx3`
+- OS Packages: `mpg123` for `gTTS` support
 
 ## Installation
 
@@ -27,6 +28,8 @@ Before you begin, ensure you have met the following requirements:
    cd gpterm
    pip install -r requirements.txt
    ```
+3. Set up the environment:
+   `echo "API_KEY=<YOURAPIKEY>" >> .env`
 
 ## Usage
 
