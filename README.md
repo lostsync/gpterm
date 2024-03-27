@@ -62,6 +62,17 @@ This handles context, by creating a longer prompt containing the context. Withou
         full_prompt = f"Remembering that I said: '{last_prompt}', and that you responded with this: '{last_response}', and being mindful of the potential to change topics, please respond to what I have said next, which is this: {prompt}"
 ```
 
+## Roadmap
+
+In the near future:
+
+- Expose options for
+   - Instructions
+   - Context Prompt
+   - Temperature
+
+- Config file support for exposed options.
+
 ## Contributing
 
 Contributions are welcome! For major changes, please open an issue first to discuss what you would like to change.
