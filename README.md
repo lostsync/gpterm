@@ -49,7 +49,7 @@ Type `quit` or `exit` to quit or exit. You can use `quit` to exit or `exit` to q
 
 ## Customization
 
-This script is simple and two lines can be updated to fully customize the behavior of the script. 
+This script is simple and two lines in `config.ini` can be updated to customize the behavior of the model. 
 
 This sets the vibe. It's the same functionality as the instructions box in your OpenAI profile:
 ```python
@@ -57,9 +57,8 @@ instructions = "Respond to the following dryly, with the emotional tone of an AI
 ```
 
 This handles context, by creating a longer prompt containing the context. Without this, the script has no way of remember who you are or what was said between prompts:
-```python
-    if last_prompt and last_response:
-        full_prompt = f"Remembering that I said: '{last_prompt}', and that you responded with this: '{last_response}', and being mindful of the potential to change topics, please respond to what I have said next, which is this: {prompt}"
+```ini
+FullPrompt = Remembering that I said: '{last_prompt}', and that you responded with this: '{last_response}', and being mindful of the potential to change topics, please respond to what I have said next, which is this: {prompt}
 ```
 
 ## Roadmap
@@ -67,8 +66,8 @@ This handles context, by creating a longer prompt containing the context. Withou
 In the near future:
 
 - Expose options for
-   - Instructions
-   - Context Prompt
+   ✔ Instructions
+   ✔ Context Prompt
    - Temperature
 
 - Config file support for exposed options.
