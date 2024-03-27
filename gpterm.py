@@ -1,44 +1,46 @@
+import os, time, random, tempfile, threading, subprocess, argparse
+
 from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-API_KEY = os.getenv("API_KEY")
-
 from openai import OpenAI
-import time
-import random
-import subprocess
 
-client = OpenAI(api_key=API_KEY)
-
-# from gtts import gTTS
+from gtts import gTTS
 import pyttsx3
 
-import os
-import tempfile
-import threading
+parser = argparse.ArgumentParser(description="A script to interact with OpenAI's API with optional TTS.")
+parser.add_argument('--tts', '-t', choices=['off', 'gtts', 'espeak'], default='off',
+                    help='Select the text-to-speech system to use: off (default), gtts, or espeak.')
+
+args = parser.parse_args()
+
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
+client = OpenAI(api_key=API_KEY)
+
 
 last_prompt = None
 last_response = None
 
-def speak_response(text, lang='en'):
-    """
-    Convert text to speech using the Google Text-to-Speech API via gtts library and play it in the background.
-    
-    :param text: The text to be converted to speech.
-    :param lang: The language of the text. Defaults to 'en' (English).
-    """
-    def _speak(rate_increase=20):
+def speak_response(text, lang='en', tts_option=args.tts):
+    if tts_option == 'gtts':
+        # gTTS functionality here
+        tts = gTTS(text=text, lang='en')
+        tts.save("response.mp3")
+        os.popen("mpg321 response.mp3 > /dev/null 2>&1")
+        pass  # Placeholder for gTTS code
+    elif tts_option == 'espeak':
         engine = pyttsx3.init()
-        rate = engine.getProperty('rate')
-        engine.setProperty('rate', rate + rate_increase)  # Adjust speech rate
-        engine.setProperty('voice', 16) 
         engine.say(text)
         engine.runAndWait()
-    
-    thread = threading.Thread(target=_speak)
-    thread.start()
+        def _speak(rate_increase=20):
+            engine = pyttsx3.init()
+            rate = engine.getProperty('rate')
+            engine.setProperty('rate', rate + rate_increase)  # Adjust speech rate
+            engine.setProperty('voice', 16) 
+            engine.say(text)
+            engine.runAndWait()
+        
+        thread = threading.Thread(target=_speak)
+        thread.start()
 
 def type_to_screen(input_text):
     for char in input_text:
@@ -58,7 +60,7 @@ def generate_response(prompt):
     full_prompt = prompt    
     # print("last_prompt: " + last_prompt)
     if last_prompt and last_response:
-        full_prompt = f"Remembering that I said: '{last_prompt}', and that you responded with this: '{last_response}', please respond to what I have said next, which is this: {prompt}"
+        full_prompt = f"Remembering that I said: '{last_prompt}', and that you responded with this: '{last_response}', and being mindful of the potential to change topics, please respond to what I have said next, which is this: {prompt}"
         # print("prompt modified " + full_prompt)
     response = client.chat.completions.create(model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": instructions + full_prompt}])
