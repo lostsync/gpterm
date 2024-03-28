@@ -24,6 +24,7 @@ Before you begin, ensure you have met the following requirements:
    git clone https://github.com/lostsync/gpterm.git
    ```
 2. Navigate to the project directory and install the dependencies:
+   _**PLEASE NOTE**_: **This list is likely incomplete at any given time, as well as requirements.txt**
    ```bash
    cd gpterm
    pip install -r requirements.txt
@@ -33,8 +34,6 @@ Before you begin, ensure you have met the following requirements:
    ```bash
    pip install pyttsx3 argparse configparser python-dotenv openai gTTS
    ```
-
-   **This list is likely incomplete at any given time, as well as requirements.txt**
 
 3. Add your API key:
    ```bash
