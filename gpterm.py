@@ -16,18 +16,33 @@ class OpenAIChat:
     def __init__(self):
         self.parser = argparse.ArgumentParser(description="A script to interact with OpenAI's API with optional TTS.")
         self.parser.add_argument('--tts', '-t', choices=['off', 'gtts', 'espeak'], default='off',
-                            help='Select the text-to-speech system to use: off (default), gtts, or espeak.')
+                                 help='Select the text-to-speech system to use: off (default), gtts, or espeak.')
+        self.parser.add_argument('--config', '-c', default=None)
         self.args = self.parser.parse_args()
+
+        config_path = self.args.config
+        if config_path is None:
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            config_path = os.path.join(script_dir, 'config.ini')
+
+        config = configparser.ConfigParser()
+        if os.path.exists(config_path):
+            config.read(config_path)
+        else:
+            # Set default values if config file is not found
+            config['DEFAULT'] = {
+                'Instructions': "You are a helpful AI assistant",
+                'FullPrompt': "Remembering that I said: '{last_prompt}', and that you responded with this: '{last_response}', and being mindful of the potential for me to abrubtly change topics, please respond to what I have said next, which is this: {prompt}"
+            }
+
         load_dotenv()
         API_KEY = os.getenv("API_KEY")
         if API_KEY is None:
             raise ValueError("API_KEY not found in environment variables")
+
         self.client = OpenAI(api_key=API_KEY)
         self.last_prompt = None
         self.last_response = None
-        self.instructions = "Respond to the following dryly, with the emotional tone of an AI that is not particularly impressed with the dystopia humanity is creating: "
-        config = configparser.ConfigParser()
-        config.read('config.ini')
         self.instructions = config.get('DEFAULT', 'Instructions')
         self.full_prompt_template = config.get('DEFAULT', 'FullPrompt')
 
