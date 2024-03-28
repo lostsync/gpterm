@@ -28,12 +28,13 @@ Before you begin, ensure you have met the following requirements:
    cd gpterm
    pip install -r requirements.txt
    ```
-   - or - 
+   or: 
 
    ```bash
    pip install pyttsx3 argparse configparser python-dotenv openai gTTS
    ```
 
+   * This list is likely incomplete at any given time, as well as requirements.txt *
 
 3. Add your API key:
    ```bash
@@ -73,11 +74,13 @@ FullPrompt = Remembering that I said: '{last_prompt}', and that you responded wi
 In the near future:
 
 - [ ] Expose options for
-   - [x]  Instructions
+   - [x] Instructions
    - [x] Context Prompt
    - [ ] Temperature
 
 - [x] Config file support for exposed options.
+   - [ ] Full assistant params in config file
+   - [ ] Stop calling them config files when they're assistant definitions
 
 ## Contributing
 
