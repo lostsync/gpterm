@@ -34,7 +34,7 @@ Before you begin, ensure you have met the following requirements:
    pip install pyttsx3 argparse configparser python-dotenv openai gTTS
    ```
 
-   * This list is likely incomplete at any given time, as well as requirements.txt *
+   **This list is likely incomplete at any given time, as well as requirements.txt**
 
 3. Add your API key:
    ```bash
