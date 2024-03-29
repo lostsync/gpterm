@@ -3,6 +3,7 @@ import time
 import random
 import pyttsx3
 import asyncio
+import platform
 import tempfile
 import argparse
 import threading
@@ -64,9 +65,21 @@ class OpenAIChat:
 
     def speak_response(self, text, lang='en'):
         if self.args.tts == 'gtts':
+         
             tts = gTTS(text=text, lang='en')
             tts.save("response.mp3")
-            os.popen("mpg321 response.mp3 > /dev/null 2>&1")
+            dir_path = os.path.dirname(os.path.realpath(__file__))
+            file_path = os.path.join(dir_path, "response.mp3")   
+            if platform.system() == 'Darwin':
+                # macOS
+                os.popen('afplay response.mp3')
+            elif platform.system() == 'Linux':
+                # Linux
+                os.popen('mpg123 response.mp3')
+            elif platform.system() == 'Windows':
+                # Windows
+                os.popen('start response.mp3')
+
         elif self.args.tts == 'espeak':
             engine = pyttsx3.init()
             rate = engine.getProperty('rate')
