@@ -1,4 +1,7 @@
-pyttsx3==2.90
-python-dotenv==1.0.1
-openai==1.14.3
-gTTS==2.5.1
+openai
+python-dotenv
+argparse
+configparser
+prompt-toolkit
+gtts
+pyttsx3

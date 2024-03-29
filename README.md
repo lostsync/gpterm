@@ -25,8 +25,6 @@ Before you begin, ensure you have met the following requirements:
    ```
 2. Navigate to the project directory and install the dependencies:
 
-   _**PLEASE NOTE**_: **This list is likely incomplete at any given time, as well as requirements.txt**
-   
    ```bash
    cd gpterm
    pip install -r requirements.txt
@@ -34,7 +32,7 @@ Before you begin, ensure you have met the following requirements:
    or: 
 
    ```bash
-   pip install pyttsx3 argparse configparser python-dotenv openai gTTS
+   pip install openai python-dotenv argparse configparser prompt-toolkit gtts pyttsx3
    ```
 
 3. Add your API key:
@@ -42,17 +40,20 @@ Before you begin, ensure you have met the following requirements:
    echo "API_KEY=<YOURAPIKEY>" >> .env
    ```
 
+   As this is in active development, you may need to install some dependencies that are not listed.
+
 ## Usage
 
 To use `GPTerm`, run the script with Python and select your preferred TTS option:
 
 ```bash
-python gpterm.py --tts [off|gtts|espeak]
+python gpterm.py --tts [off|gtts|espeak] --typing-speed [seconds]
 ```
 
 - `--tts off`: Disables TTS (default).
 - `--tts gtts`: Uses Google's Text-to-Speech engine.
 - `--tts espeak`: Uses the eSpeak TTS engine.
+- `--typing-spead`: Adjust typing effect in seconds; default is `0.05`
 
 Type `quit` or `exit` to quit or exit. You can use `quit` to exit or `exit` to quit. You have options.
 

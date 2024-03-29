@@ -2,11 +2,16 @@ import os
 import time
 import random
 import pyttsx3
+import asyncio
 import tempfile
 import argparse
 import threading
 import subprocess
 import configparser
+from prompt_toolkit import PromptSession
+from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.filters import Condition
+from prompt_toolkit.application import run_in_terminal
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -15,6 +20,8 @@ from gtts import gTTS
 class OpenAIChat:
     def __init__(self):
         self.parser = argparse.ArgumentParser(description="A script to interact with OpenAI's API with optional TTS.")
+        self.parser.add_argument('--typing-speed', '-s', type=float, default=0.05,
+                                 help='Typing speed for the chatbot response (default: 0.05).')
         self.parser.add_argument('--tts', '-t', choices=['off', 'gtts', 'espeak'], default='off',
                                  help='Select the text-to-speech system to use: off (default), gtts, or espeak.')
         self.parser.add_argument('--config', '-c', default=None)
@@ -46,6 +53,14 @@ class OpenAIChat:
         self.instructions = config.get('DEFAULT', 'Instructions')
         self.full_prompt_template = config.get('DEFAULT', 'FullPrompt')
 
+    def generate_response(self, prompt):
+        full_prompt = prompt    
+        
+        if self.last_prompt and self.last_response:
+            full_prompt = self.full_prompt_template.format(last_prompt=self.last_prompt, last_response=self.last_response, prompt=prompt)
+        response = self.client.chat.completions.create(model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": self.instructions + full_prompt}])
+        return response.choices[0].message.content.strip()
 
     def speak_response(self, text, lang='en'):
         if self.args.tts == 'gtts':
@@ -60,26 +75,21 @@ class OpenAIChat:
             engine.say(text)
             engine.runAndWait()
 
-    def type_to_screen(self, input_text):
-        for char in input_text:
-            print(char, end='', flush=True)  # Print character without adding a newline
-            if char == ' ':
-                time.sleep(random.uniform(0.1, 0.25))  # Longer pause for space between words
-            else:
-                time.sleep(random.uniform(0.01, 0.05))  # Shorter random pause between letters
+    async def main(self):
+        session = PromptSession()
+        bindings = KeyBindings()
 
-    def generate_response(self, prompt):
-        full_prompt = prompt    
-        
-        if self.last_prompt and self.last_response:
-            full_prompt = self.full_prompt_template.format(last_prompt=self.last_prompt, last_response=self.last_response, prompt=prompt)
-        response = self.client.chat.completions.create(model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": self.instructions + full_prompt}])
-        return response.choices[0].message.content.strip()
+        @bindings.add('c-l')
+        def _(event):
+            event.app.output.clear_buffer()
+            print(event.app.output.flush())
 
-    def main(self):
         while True:
-            user_input = input("> ")
+            try:
+                user_input = await session.prompt_async('> ', key_bindings=bindings)
+            except KeyboardInterrupt:
+                break
+
             if user_input.lower() in ["quit", "exit"]:
                 break
 
@@ -87,11 +97,19 @@ class OpenAIChat:
             self.last_prompt = user_input
             self.speak_response(self.last_response)
 
-            print('» ', end='')
-            self.type_to_screen(self.last_response)
+            print('» ', end='', flush=True)
+            await self.type_to_screen_async(self.last_response)
             print('\n')
+
+    async def type_to_screen_async(self, input_text):
+        typing_speed = self.args.typing_speed
+        for char in input_text:
+            print(char, end='', flush=True)  # Print character without adding a newline
+            if char == ' ':
+                await asyncio.sleep(typing_speed * 2)  # Longer pause for space between words
+            else:
+                await asyncio.sleep(typing_speed)  # Pause between letters
 
 if __name__ == "__main__":
     chat = OpenAIChat()
-    chat.main()
-
+    asyncio.run(chat.main())
