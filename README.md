@@ -68,12 +68,12 @@ Instructions = "Respond to the following dryly, with the emotional tone of an AI
 
 This handles context, by creating a longer prompt containing the context. Without this, the script has no way of remember who you are or what was said between prompts:
 ```ini
-FullPrompt = Remembering that I said: '{last_prompt}', and that you responded with this: '{last_response}', and being mindful of the potential to change topics, please respond to what I have said next, which is this: {prompt}
+FullPrompt = "Remembering that I said: '{last_prompt}', and that you responded with this: '{last_response}', and being mindful of the potential to change topics, please respond to what I have said next, which is this: {prompt}"
 ```
 
 Name can be set by setting `Name`, e.g.:
 ```ini
-Name = GPTerm
+Name = "GPTerm"
 ```
 
 This will produce:
