@@ -71,6 +71,17 @@ This handles context, by creating a longer prompt containing the context. Withou
 FullPrompt = Remembering that I said: '{last_prompt}', and that you responded with this: '{last_response}', and being mindful of the potential to change topics, please respond to what I have said next, which is this: {prompt}
 ```
 
+Name can be set by setting `Name`, e.g.:
+```ini
+Name = GPTerm
+```
+
+This will produce:
+```
+> Hi
+GPTerm» Hello there! How can I assist you today?
+```
+
 ## Roadmap
 
 In the near future:
@@ -91,3 +102,4 @@ Contributions are welcome! For major changes, please open an issue first to disc
 ## License
 
 `GPTerm` is licensed under the Apache License 2.0. See the `LICENSE` file for more details.
+
